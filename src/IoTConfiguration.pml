@@ -121,6 +121,7 @@ init
 
 
         /******************** Policies *************************/
+        // DefaultPolicy	data[Client_*] [MiHome]	[Client_owner]	[View, Control(create)]	
         Policies[0].id = 0;
         Policies[0].resource.typeID = 0;
         Policies[0].resource.data.userId = ALLUSERS;
@@ -129,6 +130,7 @@ init
         Policies[0].rights[0].id = 0;
         Policies[0].rights[1].id = 1;
 
+        // DefaultPolicy	AccessList-—MiHome—[user]	[MiHome]	[Client_owner]	[View, Control]
 
 
 
