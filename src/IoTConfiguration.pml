@@ -6,6 +6,9 @@
 #define MAXDEVICE 20
 
 #define ALLUSERS 0
+#define host 1
+#define guest 2
+
 
 typedef PersonalData{
     // Personal data is "not" empty at first
@@ -33,6 +36,9 @@ typedef Resource{
     History history;
 }
 
+/*
+0	MiHome
+*/
 typedef Channel{
     short id = -1;
 }
@@ -41,6 +47,10 @@ typedef Subject{
     short id = -1;
 }
 
+/*
+0	View
+1	Control (create)
+*/
 typedef Right{
     short id = -1;
 }
@@ -114,13 +124,19 @@ init
         Policies[0].id = 0;
         Policies[0].resource.typeID = 0;
         Policies[0].resource.data.userId = ALLUSERS;
+        Policies[0].chans[0].id = 0;
+        Policies[0].subs[0].id = host;
+        Policies[0].rights[0].id = 0;
+        Policies[0].rights[1].id = 1;
+
+
 
 
 
     }
     // host: {userId = 1}
-    run ProcessHost(1); 
-    // guest_1: {userId = 2}
-    run ProcessGuest(2); 
+    run ProcessHost(host); 
+    // guest: {userId = 2}
+    run ProcessGuest(guest); 
     // run ProcessGuest(); 
 }
