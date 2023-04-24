@@ -27,7 +27,7 @@ typedef History{
 }
 
 typedef Resource{
-    short id = -1;
+    short typeId = -1;
     short state = -1;
     PersonalData data;
     History history;
@@ -62,7 +62,6 @@ typedef Device{
 }
 
 // ALL resources
-Resource RES[MAXRESOURCE];
 Device Devices[MAXDEVICE];
 // store "OUT" of Devices
 Policy Policies[MAXPOLICY];
@@ -98,10 +97,8 @@ init
 {	
     atomic{
         /******************** Resources *************************/
-        // data[signle client]
-        RES[0].id = 0;
-        // Accesslist
-        RES[1].id = 1;
+        // typeID-0: data[signle client]
+        // typeID-1: Accesslist
 
 
 
@@ -109,15 +106,21 @@ init
         /******************** Devices *************************/
         // Yunmai smart scale
         Devices[0].id = 0;
-        Devices[0].resources[0] = RES[0];
-        Devices[0].resources[1] = RES[1];
+        Devices[0].resources[0].typeID = 0;
+        Devices[0].resources[1].typeID = 1;
 
 
         /******************** Policies *************************/
         Policies[0].id = 0;
+        Policies[0].resource.typeID = 0;
+        Policies[0].resource.data.userId = ALLUSERS;
+
+
 
     }
+    // host: {userId = 1}
     run ProcessHost(1); 
+    // guest_1: {userId = 2}
     run ProcessGuest(2); 
     // run ProcessGuest(); 
 }
