@@ -147,6 +147,7 @@ inline check_policy(_res, channel_id, user_id, right_id){
                 i = i - 1;
             :: else -> break;
         od;
+        
         // CHECK-2: Check policy with {resource, subject, right} only
         
         i = PolicyNum - 1;
@@ -439,10 +440,12 @@ init
         Devices[0].resources[1].data.isEmpty = false;
         Devices[0].resources[2].id = 1;
 
-        // 
+        // Philips hue brdige
+        Devices[1].id = 1;
 
 
         /******************** Default Policies *************************/
+        // Yunmai smart scale
         // DefaultPolicy	data[Client_*] [MiHome]	[Client_owner]	[View, Control(create)]
         Policies[PolicyNum].id = PolicyNum;
         Policies[PolicyNum].resource.id = 0;    
@@ -462,6 +465,9 @@ init
         Policies[PolicyNum].rights[1].id = 1;
         Policies[PolicyNum].rights[2].id = 2;
         PolicyNum = PolicyNum + 1;
+
+
+        // Philips hue brdige
 
 
 
