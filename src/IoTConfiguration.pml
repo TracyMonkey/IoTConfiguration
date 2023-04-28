@@ -259,7 +259,11 @@ inline Yunmai_smart_scale_SHARE(user_A, user_B, device_id){
                 Policies[PolicyNum].chans[0].id = 1;
                 Policies[PolicyNum].subs[0].id = user_B;
                 Policies[PolicyNum].rights[0].id = 3;
-                PolicyNum = PolicyNum + 1;        
+                PolicyNum = PolicyNum + 1;      
+
+
+                // Then guest can create his personal data after sharing
+                Devices[device_id].resources[1].data.isEmpty = false
             :: else ->
                 printf("Deny\n") 
         fi;
@@ -437,7 +441,7 @@ init
         Devices[0].resources[0].data.isEmpty = false;
         Devices[0].resources[1].id = 0;
         Devices[0].resources[1].data.userId = guest;
-        Devices[0].resources[1].data.isEmpty = false;
+        Devices[0].resources[1].data.isEmpty = true;
         Devices[0].resources[2].id = 1;
 
         // Philips hue brdige
