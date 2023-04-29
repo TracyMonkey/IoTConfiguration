@@ -10,6 +10,8 @@
 #define host 1
 #define guest 2
 
+#define netvue 3
+
 
 typedef PersonalData{
     // Personal data is "not" empty at first
@@ -30,6 +32,15 @@ typedef History{
     short userId = -1;
 }
 
+typedef ThirdPartyServices{
+    // Third party services is linked to the account
+    bool isLinked = 0;
+    // Third party services can be used by other users
+    bool shared = 0;
+    // If userId == ALLUSERS, means the resource can be used by all users
+    short userId = -1;
+}
+
 // 0	data[single user]
 // 1	AccessList
 // 2 	Constraints
@@ -39,11 +50,14 @@ typedef Resource{
     short state = -1;
     PersonalData data;
     History history;
+    ThirdPartyServices thirdPartyServices;
 }
 
 /*
 0	MiHome
 1	MiHome—-Guest Mode
+
+3   Netvue
 */
 typedef Channel{
     short id = -1;
@@ -57,7 +71,7 @@ typedef Subject{
 0	View
 1	Control (create)
 2	Control (remove)
-3	Control(whether collect)
+3	Control (whether collect)
 */
 typedef Right{
     short id = -1;
@@ -376,6 +390,195 @@ inline Operation_read_personaldata(user_id, device_id){
 }
 
 
+/******************** Netvue camera *************************/
+// SHARE
+inline Netvue_camera_SHARE(user_A, user_B, device_id){
+    atomic{
+        printf("'Netvue_camera': Share (user_%d → user_%d) in 'Netvue app' using 'shared user' role \n", user_A, user_B);
+
+        check_policy_result = false;
+        // {resource:1, channel_id:0, user_id, right_id}
+        res_need_check.id = 1;
+        check_policy(res_need_check, netvue, user_A, 1)
+        if
+            ::  (check_policy_result == true) -> 
+                printf("Allow\n")
+                // Policy	data[Client_*]	[Netvue]	[Client_B]	[View, Control(create)]   
+                Devices[device_id].canBeRevoked[0].id = PolicyNum;             
+                Policies[PolicyNum].id = PolicyNum;
+                Policies[PolicyNum].resource.id = 3; // history
+                Policies[PolicyNum].resource.history.userId = ALLUSERS;
+                Policies[PolicyNum].chans[0].id = 0;
+                Policies[PolicyNum].subs[0].id = user_B;
+                Policies[PolicyNum].rights[0].id = 0;
+                Policies[PolicyNum].rights[1].id = 1;
+                PolicyNum = PolicyNum + 1;
+
+                // Policy	AccessList-Netvue-[user]	[Netvue]	[Client_B]	[View, Control(collect)]
+                Devices[device_id].canBeRevoked[1].id = PolicyNum;
+                Policies[PolicyNum].id = PolicyNum;
+                Policies[PolicyNum].resource.id = 1;
+                Policies[PolicyNum].chans[0].id = netvue;
+                Policies[PolicyNum].subs[0].id = user_B;
+                Policies[PolicyNum].rights[0].id = 0;
+                Policies[PolicyNum].rights[1].id = 3;
+                PolicyNum = PolicyNum + 1;             
+
+                // Then guest can create his history data after sharing
+                Devices[device_id].resources[1].history.isEmpty = false;
+                
+            :: else ->
+                printf("Deny\n") 
+        fi;
+        
+    }
+}
+
+// MOTION DETECTION
+inline Netvue_camera_ENABLE_MOTION_DETECTION(user_id, device_id){
+    atomic{
+        printf("'Netvue_camera': user_%d enable motion detection in 'Netvue app', user_A");
+        check_policy_result = false;
+        // {resource:1, channel_id:0, user_id, right_id}  only host can enable motion detection
+        res_need_check.id = 1;
+        check_policy(res_need_check, netvue, user_id, 1)
+        if 
+            :: (check_policy_result == true) -> 
+                printf("Allow\n")
+
+
+            :: else -> 
+                printf("Deny\n")
+                
+        fi;
+    }
+}
+
+// MOTION DETECTION
+inline Netvue_camera_ENABLE_MOTION_DETECTION_CONDITIONS(user_id, device_id){
+    atomic{
+        printf("'Netvue_camera': user_%d enable motion detection conditions in 'Netvue app', user_A");
+        printf("Motion detection conditions includes: set time && has at least one zone on && sensitivity > 0. ");
+        check_policy_result = false;
+        // {resource:1, channel_id:0, user_id, right_id}  only host can enable motion detection
+        res_need_check.id = 1;
+        check_policy(res_need_check, netvue, user_id, 1)
+        if 
+            :: (check_policy_result == true) -> 
+                printf("Allow\n")
+
+
+            :: else -> 
+                printf("Deny\n")
+                
+        fi;
+    }
+}
+
+
+inline Netvue_camera_ENABLE_MOTION_ALERT(user_id, device_id){
+    atomic{
+        printf("'Netvue_camera': user_%d enalbe motion detection in 'Netvue app', user_A"); 
+        printf("Motion detection conditions includes: alert filter has selection. ");
+        check_policy_result = false;
+        // {resource:1, channel_id:0, user_id, right_id}  only host can enable motion detection
+        res_need_check.id = 1;
+        check_policy(res_need_check, 3, user_id, 1)
+        if 
+            :: (check_policy_result == true) -> 
+                printf("Allow\n")
+                i = 0;
+                do 
+                    :: 
+
+    }
+}
+
+inline Netvue_camera_ENABLE_MOTION_ALERT_CONDITION(user_id, device_id){
+    atomic{
+        printf("'Netvue_camera': user_%d enalbe motion detection in 'Netvue app', user_A");
+        check_policy_result = false;
+        // {resource:1, channel_id:0, user_id, right_id}  only host can enable motion detection
+        res_need_check.id = 1;
+        check_policy(res_need_check, 3, user_id, 1)
+        if 
+            :: (check_policy_result == true) -> 
+                printf("Allow\n")
+                i = 0;
+                do 
+                    :: 
+
+    }
+}
+
+// REVOKE
+inline Netvue_camera_REVOKE(user_A, user_B, device_id){
+    atomic{
+        printf("'Netvue_camera': Revoke (user_%d → user_%d) in 'Netvue app'\n", user_A, user_B);
+        check_policy_result = false;
+        // {resource:1, channel_id:0, user_id, right_id}
+        res_need_check.id = 1;
+        check_policy(res_need_check, 0, user_A, 1)
+        if
+            ::  (check_policy_result == true) -> 
+                printf("Allow\n")
+                i = 0;
+                do
+                    :: (i < MAXPOLICY) ->
+                        if
+                            :: (Devices[device_id].canBeRevoked[i].id == -1) -> break;
+                            :: else ->
+                                Policies[Devices[device_id].canBeRevoked[i].id].banned = true;
+                        fi;
+                        i = i + 1;
+                    :: else -> break;
+                od;    
+            :: else ->
+                printf("Deny\n") 
+        fi;
+    }
+}
+
+// read history
+inline Operation_view_notifications(user_id, device_id){
+    atomic{
+        i = 0;
+        do
+            :: (i < MAXRESOURCE) ->
+                if
+                    :: (Devices[device_id].resources[i].id == -1) -> break;
+                    :: (Devices[device_id].resources[i].id == 0) ->
+                        if 
+                            :: (Devices[device_id].resources[i].data.isEmpty == false) ->
+                                printf("user_%d read personal data of user_%d through 'MiHome app'\n", user_id, Devices[device_id].resources[i].data.userId);
+                                check_policy_result = false;
+                                // {resource:0, channel_id:0, user_id, right_id}
+                                res_need_check.id = 0;
+                                res_need_check.data.userId = Devices[device_id].resources[i].data.userId;
+                                check_policy(res_need_check, 0, user_id, 0)
+                                if
+                                    ::  (check_policy_result == true) -> 
+                                        printf("Allow\n")
+                                        assert (user_id == Devices[device_id].resources[i].data.userId);
+                                    :: else ->
+                                        printf("Deny\n") 
+                                fi;
+                            :: else -> skip;
+                        fi;
+                    :: else -> skip;
+                fi;
+                i = i + 1;
+            :: else -> break;
+        od;   
+
+    }
+}
+
+// 
+inline Operation_delete_historydata(user_id, device_id){
+
+}
+
 
 // inline SecurityProperties(user_id){
 //     atomic{
@@ -396,9 +599,18 @@ proctype ProcessHost(){
     bool check_policy_result = false;
     Resource res_need_check;
     do
+        // 0 Yunmai
         :: Yunmai_smart_scale_SHARE(host, guest, Devices[0].id);
         :: Yunmai_smart_scale_REVOKE(host, guest, Devices[0].id);
         :: Operation_read_personaldata(host, Devices[0].id);
+        // 1 Phillips
+        // 2 Google home
+        // 3 Netvue
+        :: Netvue_camera_SHARE(host, guest, Devices[3].id);
+        :: Netvue_camera_ENABLE_MOTION_DETECTION(host, Devices[3].id);
+        :: Netvue_camera_REVOKE(host, guest, Devices[3].id);
+        :: Operation_read_historydata(host, Devices[0].id);
+        :: Operation_delete_historydata(host, Devices[0].id);
     od;
 }
 
@@ -415,8 +627,13 @@ proctype ProcessGuest(){
     Resource res_need_check;
 
     do
+        // 0 Yunmai
         :: Yunmai_smart_scale_GUESTMODE(guest, Devices[0].id, true);
         :: Operation_read_personaldata(guest, Devices[0].id);
+        // 1 Phillips
+        // 2 Google home
+        // 3 Netvue
+        :: Operation_read_historydata(guest, Devices[3].id);
     od;
 
 }
@@ -441,11 +658,29 @@ init
         Devices[0].resources[0].data.isEmpty = false;
         Devices[0].resources[1].id = 0;
         Devices[0].resources[1].data.userId = guest;
-        Devices[0].resources[1].data.isEmpty = true;
-        Devices[0].resources[2].id = 1;
+        Devices[0].resources[1].data.isEmpty = true;                         // why is true
+        Devices[0].resources[2].id = 1;                                      // ? what is this
 
         // Philips hue brdige
         Devices[1].id = 1;
+
+        // Google home // todo
+        Devices[2].id = 2;
+        Devices[2].resources[0].id = 4; // whether 4?
+        Devices[2].resources[0].thirdPartyServices.userId = host;
+        Devices[2].resources[0].thirdPartyServices.isLinked = false;
+        Devices[2].resources[1].id = 4; // whether 4?
+        Devices[2].resources[1].thirdPartyServices.userId = guest;
+        Devices[2].resources[1].thirdPartyServices.isLinked = false;
+
+        // Netvue camera
+        Devices[3].id = 3;
+        Devices[3].resources[0].id = 3;
+        Devices[3].resources[0].history.userId = host;
+        Devices[3].resources[0].history.isEmpty = false;
+        Devices[3].resources[1].id = 3;
+        Devices[3].resources[1].history.userId = guest;
+        Devices[3].resources[1].history.isEmpty = true;
 
 
         /******************** Default Policies *************************/
@@ -474,7 +709,45 @@ init
         // Philips hue brdige
 
 
+        // // Google home
+        // // DefaultPolicy	AccessList-—MiHome—[user]	[GoogleHome]	[Client_owner]	[View, Control]
+        // Policies[PolicyNum].id = PolicyNum;
+        // Policies[PolicyNum].resource.id = 4;    
+        // Policies[PolicyNum].resource.data.userId = ALLUSERS;
+        // Policies[PolicyNum].chans[0].id = 0;
+        // Policies[PolicyNum].subs[0].id = host;
+        // Policies[PolicyNum].rights[0].id = 0;
+        // Policies[PolicyNum].rights[1].id = 1;
+        // PolicyNum = PolicyNum + 1;
+        // // DefaultPolicy	AccessList-—MiHome—[user]	[GoogleHome]	[Client_owner]	[View, Control]
+        // Policies[PolicyNum].id = PolicyNum;
+        // Policies[PolicyNum].resource.id = 4;
+        // Policies[PolicyNum].chans[0].id = 0;
+        // Policies[PolicyNum].subs[0].id = host;
+        // Policies[PolicyNum].rights[0].id = 0;
+        // Policies[PolicyNum].rights[1].id = 1;
+        // Policies[PolicyNum].rights[2].id = 2;
+        // PolicyNum = PolicyNum + 1;
 
+        // Netvue camera
+        // DefaultPolicy	history[Client_*] [Netvue]	[Client_owner]	[View, Control(create)]
+        Policies[PolicyNum].id = PolicyNum;
+        Policies[PolicyNum].resource.id = 0;    
+        Policies[PolicyNum].resource.history.userId = ALLUSERS;
+        Policies[PolicyNum].chans[0].id = netvue;
+        Policies[PolicyNum].subs[0].id = host;
+        Policies[PolicyNum].rights[0].id = 0;
+        Policies[PolicyNum].rights[1].id = 1;
+        PolicyNum = PolicyNum + 1;
+        // DefaultPolicy	AccessList-Netvue-[user]	[Netvue]	[Client_owner]	[View, Control]         // why accesssList
+        Policies[PolicyNum].id = PolicyNum;
+        Policies[PolicyNum].resource.id = 1;
+        Policies[PolicyNum].chans[0].id = netvue;
+        Policies[PolicyNum].subs[0].id = host;
+        Policies[PolicyNum].rights[0].id = 0;
+        Policies[PolicyNum].rights[1].id = 1;
+        Policies[PolicyNum].rights[2].id = 2;
+        PolicyNum = PolicyNum + 1;
     }
     // host: {userId = 1}
     run ProcessHost(); 
