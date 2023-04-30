@@ -500,21 +500,21 @@ inline Netvue_camera_ENABLE_MOTION_DETECTION(user_id, device_id){
                 Policies[PolicyNum].rights[1].id = 4;
                 Policies[PolicyNum].rights[2].id = 6;
                 PolicyNum = PolicyNum + 1;
-                printf("policy num: %d\n", PolicyNum);
+                
 
                 // check p3 (5,3,2,4): whether guest exists
                 check_policy_result = false;
                 res_need_check.id = 5;
-                check_policy(res_need_check, netvue, 2, 4);
+                check_policy(res_need_check, netvue, guest, 4);
                 
                 printf("check result: %d\n", check_policy_result);
 
-                assert (2==1);
+                
                 if 
                     :: (check_policy_result == true) -> 
                         printf("Allow, create policy for guests.\n");
 
-                        assert (2==1);
+                        // assert (2==1);
 
                         // p5 + (history: 3; netvue: 3; guest: 2; control(collect): 3)
                         Policies[PolicyNum].id = PolicyNum;
@@ -560,21 +560,24 @@ inline Netvue_camera_ENABLE_MOTION_DETECTION_CONDITIONS(user_id, device_id){
                 Policies[PolicyNum].rights[0].id = 0;
                 PolicyNum = PolicyNum + 1;
 
+                printf("policy num: %d\n", PolicyNum);
+                // assert (2==1);
+
                 // check p3 (5,3,1,4): whether guest exists
                 check_policy_result = false;
                 res_need_check.id = 5;
-                check_policy(res_need_check, netvue, 1, 4)
+                check_policy(res_need_check, netvue, guest, 4)
 
                 if 
                     :: (check_policy_result == true) -> 
                         printf("Allow, create policy for guests.\n");
 
-                        // p7 + (history: 3; netvue: 3; guest: 1; view: 0)
+                        // p7 + (history: 3; netvue: 3; guest: 2; view: 0)
                         Policies[PolicyNum].id = PolicyNum;
                         Policies[PolicyNum].resource.id = 3; // history
                         Policies[PolicyNum].resource.history.userId = ALLUSERS;
                         Policies[PolicyNum].chans[0].id = netvue;
-                        Policies[PolicyNum].subs[0].id = user_id;
+                        Policies[PolicyNum].subs[0].id = guest;
                         Policies[PolicyNum].rights[0].id = 0;
                         PolicyNum = PolicyNum + 1;
 
@@ -674,15 +677,15 @@ inline Operation_view_notifications(user_id, device_id){
                             :: (Devices[device_id].resources[i].history.isEmpty == false) ->
                                 printf("user_%d read history of user_%d through 'Netvue app'\n", user_id, Devices[device_id].resources[i].history.userId);
                                 check_policy_result = false;
-                                // check p7 (3,3,1,0)
+                                // check p7 (3,3,2,0)
                                 res_need_check.id = 3;
                                 res_need_check.history.userId = Devices[device_id].resources[i].history.userId;
-                                check_policy(res_need_check, netvue, host,2)
+                                check_policy(res_need_check, netvue, 2 ,0)
                                 if
                                     ::  (check_policy_result == true) -> 
                                         printf("Allow\n");
                                         printf("test\n");
-                                        // assert (user_id == Devices[device_id].resources[i].history.userId);    
+                                        assert (user_id == Devices[device_id].resources[i].history.userId);    
                                         // assert (1==2);
                                     :: else ->
                                         printf("Deny\n") 
@@ -729,9 +732,9 @@ proctype ProcessHost(){
         // 3 Netvue
         :: Netvue_camera_SHARE(host, guest, Devices[3].id);
         :: Netvue_camera_ENABLE_MOTION_DETECTION(host, Devices[3].id);
-        // :: Netvue_camera_ENABLE_MOTION_DETECTION_CONDITIONS(host, Devices[3].id);
-        // :: Netvue_camera_REVOKE(host, guest, Devices[3].id);
-        // :: Netvue_camera_delete_history(host, Devices[3].id);
+        :: Netvue_camera_ENABLE_MOTION_DETECTION_CONDITIONS(host, Devices[3].id);
+        :: Netvue_camera_REVOKE(host, guest, Devices[3].id);
+        :: Netvue_camera_delete_history(host, Devices[3].id);
     od;
 }
 
