@@ -10,7 +10,10 @@
 #define host 1
 #define guest 2
 
-#define netvue 3
+#define netvueCamera 3
+#define mihomeCamera 4
+#define mihomeSmartLock 5
+#define amazonEchoDot 6
 
 
 typedef PersonalData{
@@ -400,7 +403,7 @@ inline Netvue_camera_SHARE(user_A, user_B, device_id){
 
         check_policy_result = false;
         res_need_check.id = 1;
-        check_policy(res_need_check, netvue, user_A, 1)
+        check_policy(res_need_check, netvueCamera, user_A, 1)
         if
             ::  (check_policy_result == true) -> 
                 printf("Allow\n")
@@ -409,7 +412,7 @@ inline Netvue_camera_SHARE(user_A, user_B, device_id){
                 Policies[PolicyNum].id = PolicyNum;
                 Policies[PolicyNum].resource.id = 5; 
                 Policies[PolicyNum].resource.history.userId = ALLUSERS;
-                Policies[PolicyNum].chans[0].id = netvue;
+                Policies[PolicyNum].chans[0].id = netvueCamera;
                 Policies[PolicyNum].subs[0].id = user_B;
                 Policies[PolicyNum].rights[0].id = 0;
                 Policies[PolicyNum].rights[1].id = 4;
@@ -428,7 +431,7 @@ inline Netvue_camera_SHARE(user_A, user_B, device_id){
                 // check p4 (3,3,1,6)
                 check_policy_result = false;
                 res_need_check.id = 3;
-                check_policy(res_need_check, netvue, user_A, 6);
+                check_policy(res_need_check, netvueCamera, user_A, 6);
                 if
                     ::  (check_policy_result == true) -> 
                         printf("Allow p5\n");       
@@ -437,7 +440,7 @@ inline Netvue_camera_SHARE(user_A, user_B, device_id){
                         Policies[PolicyNum].id = PolicyNum;
                         Policies[PolicyNum].resource.id = 3; // history
                         Policies[PolicyNum].resource.history.userId = ALLUSERS;
-                        Policies[PolicyNum].chans[0].id = netvue;
+                        Policies[PolicyNum].chans[0].id = netvueCamera;
                         Policies[PolicyNum].subs[0].id = user_B;
                         Policies[PolicyNum].rights[0].id = 3;
                         PolicyNum = PolicyNum + 1;
@@ -449,7 +452,7 @@ inline Netvue_camera_SHARE(user_A, user_B, device_id){
                 // check p6 (3,3,0,0)
                 check_policy_result = false;
                 res_need_check.id = 3;
-                check_policy(res_need_check, netvue, user_A, 0);
+                check_policy(res_need_check, netvueCamera, user_A, 0);
                 if
                     ::  (check_policy_result == true) -> 
                         printf("Allow p7\n");
@@ -458,7 +461,7 @@ inline Netvue_camera_SHARE(user_A, user_B, device_id){
                         Policies[PolicyNum].id = PolicyNum;
                         Policies[PolicyNum].resource.id = 3; // history
                         Policies[PolicyNum].resource.history.userId = ALLUSERS;
-                        Policies[PolicyNum].chans[0].id = netvue;
+                        Policies[PolicyNum].chans[0].id = netvueCamera;
                         Policies[PolicyNum].subs[0].id = user_B;
                         Policies[PolicyNum].rights[0].id = 0;
                         PolicyNum = PolicyNum + 1;
@@ -484,17 +487,17 @@ inline Netvue_camera_ENABLE_MOTION_DETECTION(user_id, device_id){
         check_policy_result = false;
         // check p2(5,3,1,5): whether user can enable motion detection
         res_need_check.id = 5;
-        check_policy(res_need_check, netvue, user_id, 0)
+        check_policy(res_need_check, netvueCamera, user_id, 0)
         printf("check result: %d\n", check_policy_result);
         if 
             :: (check_policy_result == true) -> 
                 printf("Allow\n");
 
-                // p4 + (history: 3; netvue: 3; owner: 1; control(collect), control(remove), control(motionSubConfigure): 2, 3, 6)
+                // p4 + (history: 3; netvueCamera: 3; owner: 1; control(collect), control(remove), control(motionSubConfigure): 2, 3, 6)
                 Policies[PolicyNum].id = PolicyNum;
                 Policies[PolicyNum].resource.id = 3; // history
                 Policies[PolicyNum].resource.history.userId = ALLUSERS;
-                Policies[PolicyNum].chans[0].id = netvue;
+                Policies[PolicyNum].chans[0].id = netvueCamera;
                 Policies[PolicyNum].subs[0].id = user_id;
                 Policies[PolicyNum].rights[0].id = 2;
                 Policies[PolicyNum].rights[1].id = 4;
@@ -505,7 +508,7 @@ inline Netvue_camera_ENABLE_MOTION_DETECTION(user_id, device_id){
                 // check p3 (5,3,2,4): whether guest exists
                 check_policy_result = false;
                 res_need_check.id = 5;
-                check_policy(res_need_check, netvue, guest, 4);
+                check_policy(res_need_check, netvueCamera, guest, 4);
                 
                 printf("check result: %d\n", check_policy_result);
 
@@ -516,11 +519,11 @@ inline Netvue_camera_ENABLE_MOTION_DETECTION(user_id, device_id){
 
                         // assert (2==1);
 
-                        // p5 + (history: 3; netvue: 3; guest: 2; control(collect): 3)
+                        // p5 + (history: 3; netvueCamera: 3; guest: 2; control(collect): 3)
                         Policies[PolicyNum].id = PolicyNum;
                         Policies[PolicyNum].resource.id = 3; // history
                         Policies[PolicyNum].resource.history.userId = ALLUSERS;
-                        Policies[PolicyNum].chans[0].id = netvue;
+                        Policies[PolicyNum].chans[0].id = netvueCamera;
                         Policies[PolicyNum].subs[0].id = guest;
                         Policies[PolicyNum].rights[0].id = 3;
                         PolicyNum = PolicyNum + 1;
@@ -546,16 +549,16 @@ inline Netvue_camera_ENABLE_MOTION_DETECTION_CONDITIONS(user_id, device_id){
         // check p4 (3,3,0,6)
         check_policy_result = false;
         res_need_check.id = 3;
-        check_policy(res_need_check, netvue, user_id, 6)
+        check_policy(res_need_check, netvueCamera, user_id, 6)
         if 
             :: (check_policy_result == true) -> 
                 printf("Allow\n")
 
-                // p6 + (history: 3; netvue: 3; owner: 0; view: 0)
+                // p6 + (history: 3; netvueCamera: 3; owner: 0; view: 0)
                 Policies[PolicyNum].id = PolicyNum;
                 Policies[PolicyNum].resource.id = 3; // history
                 Policies[PolicyNum].resource.history.userId = ALLUSERS;
-                Policies[PolicyNum].chans[0].id = netvue;
+                Policies[PolicyNum].chans[0].id = netvueCamera;
                 Policies[PolicyNum].subs[0].id = user_id;
                 Policies[PolicyNum].rights[0].id = 0;
                 PolicyNum = PolicyNum + 1;
@@ -566,17 +569,17 @@ inline Netvue_camera_ENABLE_MOTION_DETECTION_CONDITIONS(user_id, device_id){
                 // check p3 (5,3,1,4): whether guest exists
                 check_policy_result = false;
                 res_need_check.id = 5;
-                check_policy(res_need_check, netvue, guest, 4)
+                check_policy(res_need_check, netvueCamera, guest, 4)
 
                 if 
                     :: (check_policy_result == true) -> 
                         printf("Allow, create policy for guests.\n");
 
-                        // p7 + (history: 3; netvue: 3; guest: 2; view: 0)
+                        // p7 + (history: 3; netvueCamera: 3; guest: 2; view: 0)
                         Policies[PolicyNum].id = PolicyNum;
                         Policies[PolicyNum].resource.id = 3; // history
                         Policies[PolicyNum].resource.history.userId = ALLUSERS;
-                        Policies[PolicyNum].chans[0].id = netvue;
+                        Policies[PolicyNum].chans[0].id = netvueCamera;
                         Policies[PolicyNum].subs[0].id = guest;
                         Policies[PolicyNum].rights[0].id = 0;
                         PolicyNum = PolicyNum + 1;
@@ -605,7 +608,7 @@ inline Netvue_camera_delete_history(user_id, device_id){
         // check p6 (3,3,0,0)
         check_policy_result = false;
         res_need_check.id = 3;
-        check_policy(res_need_check, netvue, user_id, 0)
+        check_policy(res_need_check, netvueCamera, user_id, 0)
         if 
             :: (check_policy_result == true) -> 
                 printf("Allow\n")
@@ -628,7 +631,7 @@ inline Netvue_camera_REVOKE(user_A, user_B, device_id){
         // check p1 (1,3,0,1)
         check_policy_result = false;
         res_need_check.id = 1;
-        check_policy(res_need_check, netvue, user_A, 1)
+        check_policy(res_need_check, netvueCamera, user_A, 1)
         if
             ::  (check_policy_result == true) -> 
                 printf("Allow\n")
@@ -636,7 +639,7 @@ inline Netvue_camera_REVOKE(user_A, user_B, device_id){
                 // check p3 (5,3,1,0)
                 check_policy_result = false;
                 res_need_check.id = 5;
-                check_policy(res_need_check, netvue, user_B, 0)
+                check_policy(res_need_check, netvueCamera, user_B, 0)
                 if
                     ::  (check_policy_result == true) -> 
                         printf("Allow\n")
@@ -680,7 +683,7 @@ inline Operation_view_notifications(user_id, device_id){
                                 // check p7 (3,3,2,0)
                                 res_need_check.id = 3;
                                 res_need_check.history.userId = Devices[device_id].resources[i].history.userId;
-                                check_policy(res_need_check, netvue, 2 ,0)
+                                check_policy(res_need_check, netvueCamera, 2 ,0)
                                 if
                                     ::  (check_policy_result == true) -> 
                                         printf("Allow\n");
@@ -785,9 +788,6 @@ init
         Devices[0].resources[1].data.isEmpty = true;                         
         Devices[0].resources[2].id = 1;                                      // ? what is this
 
-        // Philips hue brdige
-        Devices[1].id = 1;
-
         // Google home // todo
         Devices[2].id = 2;
         Devices[2].resources[0].id = 4; // whether 4?
@@ -798,13 +798,40 @@ init
         Devices[2].resources[1].thirdPartyServices.isLinked = false;
 
         // Netvue camera
-        Devices[3].id = 3;
-        Devices[3].resources[0].id = 3;
-        Devices[3].resources[0].history.userId = host;
-        Devices[3].resources[0].history.isEmpty = false;
-        Devices[3].resources[1].id = 3;
-        Devices[3].resources[1].history.userId = guest;
-        Devices[3].resources[1].history.isEmpty = true;
+        Devices[netvueCamera].id = 3;
+        Devices[netvueCamera].resources[0].id = 3;
+        Devices[netvueCamera].resources[0].history.userId = host;
+        Devices[netvueCamera].resources[0].history.isEmpty = false;
+        Devices[netvueCamera].resources[1].id = 3;
+        Devices[netvueCamera].resources[1].history.userId = guest;
+        Devices[netvueCamera].resources[1].history.isEmpty = true;
+
+        // Mihome camera
+        Devices[mihomeCamera].id = 3;
+        Devices[mihomeCamera].resources[0].id = 3;
+        Devices[mihomeCamera].resources[0].history.userId = host;
+        Devices[mihomeCamera].resources[0].history.isEmpty = false;
+        Devices[mihomeCamera].resources[1].id = 3;
+        Devices[mihomeCamera].resources[1].history.userId = guest;
+        Devices[mihomeCamera].resources[1].history.isEmpty = true;
+
+        // mihomeSmartLock
+        Devices[mihomeSmartLock].id = 3;
+        Devices[mihomeSmartLock].resources[0].id = 3;
+        Devices[mihomeSmartLock].resources[0].history.userId = host;
+        Devices[mihomeSmartLock].resources[0].history.isEmpty = false;
+        Devices[mihomeSmartLock].resources[1].id = 3;
+        Devices[mihomeSmartLock].resources[1].history.userId = guest;
+        Devices[mihomeSmartLock].resources[1].history.isEmpty = true;
+
+        // amazonEchoDot
+        Devices[amazonEchoDot].id = 3;
+        Devices[amazonEchoDot].resources[0].id = 3;
+        Devices[amazonEchoDot].resources[0].history.userId = host;
+        Devices[amazonEchoDot].resources[0].history.isEmpty = false;
+        Devices[amazonEchoDot].resources[1].id = 3;
+        Devices[amazonEchoDot].resources[1].history.userId = guest;
+        Devices[amazonEchoDot].resources[1].history.isEmpty = true;
 
 
         /******************** Default Policies *************************/
@@ -829,47 +856,63 @@ init
         Policies[PolicyNum].rights[2].id = 2;
         PolicyNum = PolicyNum + 1;
 
-
-        // Philips hue brdige
-
-
-        // // Google home
-        // // DefaultPolicy	AccessList-—MiHome—[user]	[GoogleHome]	[Client_owner]	[View, Control]
-        // Policies[PolicyNum].id = PolicyNum;
-        // Policies[PolicyNum].resource.id = 4;    
-        // Policies[PolicyNum].resource.data.userId = ALLUSERS;
-        // Policies[PolicyNum].chans[0].id = 0;
-        // Policies[PolicyNum].subs[0].id = host;
-        // Policies[PolicyNum].rights[0].id = 0;
-        // Policies[PolicyNum].rights[1].id = 1;
-        // PolicyNum = PolicyNum + 1;
-        // // DefaultPolicy	AccessList-—MiHome—[user]	[GoogleHome]	[Client_owner]	[View, Control]
-        // Policies[PolicyNum].id = PolicyNum;
-        // Policies[PolicyNum].resource.id = 4;
-        // Policies[PolicyNum].chans[0].id = 0;
-        // Policies[PolicyNum].subs[0].id = host;
-        // Policies[PolicyNum].rights[0].id = 0;
-        // Policies[PolicyNum].rights[1].id = 1;
-        // Policies[PolicyNum].rights[2].id = 2;
-        // PolicyNum = PolicyNum + 1;
-
         // Netvue camera
         // DefaultPolicy	AccessList[Client_*] [Netvue]	[Client_owner]	[View, Control(create)]
-        // p1: 1,3,1,0/1/2
         Policies[PolicyNum].id = PolicyNum;
         Policies[PolicyNum].resource.id = 1;    
         Policies[PolicyNum].resource.history.userId = ALLUSERS;
-        Policies[PolicyNum].chans[0].id = netvue;
+        Policies[PolicyNum].chans[0].id = netvueCamera;
         Policies[PolicyNum].subs[0].id = host;
         Policies[PolicyNum].rights[0].id = 0;
         Policies[PolicyNum].rights[1].id = 1;
         Policies[PolicyNum].rights[2].id = 2;
         PolicyNum = PolicyNum + 1;
         // DefaultPolicy	device-Netvue-[user]	[Netvue]	[Client_owner]	[View, Control]       
-        // p2: 5,3,1,0/4/5
         Policies[PolicyNum].id = PolicyNum;
         Policies[PolicyNum].resource.id = 5;
-        Policies[PolicyNum].chans[0].id = netvue;
+        Policies[PolicyNum].chans[0].id = netvueCamera;
+        Policies[PolicyNum].subs[0].id = host;
+        Policies[PolicyNum].rights[0].id = 0;
+        Policies[PolicyNum].rights[1].id = 4;
+        Policies[PolicyNum].rights[2].id = 5;
+        PolicyNum = PolicyNum + 1;
+
+        // mihomeSmartLock
+        // DefaultPolicy	AccessList[Client_*] [Mihome]	[Client_owner]	[View, Control(create)]
+        Policies[PolicyNum].id = PolicyNum;
+        Policies[PolicyNum].resource.id = 1;    
+        Policies[PolicyNum].resource.history.userId = ALLUSERS;
+        Policies[PolicyNum].chans[0].id = mihomeSmartLock;
+        Policies[PolicyNum].subs[0].id = host;
+        Policies[PolicyNum].rights[0].id = 0;
+        Policies[PolicyNum].rights[1].id = 1;
+        Policies[PolicyNum].rights[2].id = 2;
+        PolicyNum = PolicyNum + 1;
+        // DefaultPolicy	device-Mihome-[user]	[Mihome]	[Client_owner]	[View, Control]       
+        Policies[PolicyNum].id = PolicyNum;
+        Policies[PolicyNum].resource.id = 5;
+        Policies[PolicyNum].chans[0].id = mihomeSmartLock;
+        Policies[PolicyNum].subs[0].id = host;
+        Policies[PolicyNum].rights[0].id = 0;
+        Policies[PolicyNum].rights[1].id = 4;
+        Policies[PolicyNum].rights[2].id = 5;
+        PolicyNum = PolicyNum + 1;
+
+        // amazonEchoDot
+        // DefaultPolicy	AccessList[Client_*] [Mihome]	[Client_owner]	[View, Control(create)]
+        Policies[PolicyNum].id = PolicyNum;
+        Policies[PolicyNum].resource.id = 1;    
+        Policies[PolicyNum].resource.history.userId = ALLUSERS;
+        Policies[PolicyNum].chans[0].id = amazonEchoDot;
+        Policies[PolicyNum].subs[0].id = host;
+        Policies[PolicyNum].rights[0].id = 0;
+        Policies[PolicyNum].rights[1].id = 1;
+        Policies[PolicyNum].rights[2].id = 2;
+        PolicyNum = PolicyNum + 1;
+        // DefaultPolicy	device-Mihome-[user]	[Mihome]	[Client_owner]	[View, Control]       
+        Policies[PolicyNum].id = PolicyNum;
+        Policies[PolicyNum].resource.id = 5;
+        Policies[PolicyNum].chans[0].id = amazonEchoDot;
         Policies[PolicyNum].subs[0].id = host;
         Policies[PolicyNum].rights[0].id = 0;
         Policies[PolicyNum].rights[1].id = 4;

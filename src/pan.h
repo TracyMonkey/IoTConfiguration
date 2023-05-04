@@ -1,10 +1,10 @@
 #ifndef PAN_H
 #define PAN_H
 
-#define SpinVersion	"Spin Version 6.5.1 -- 31 July 2020"
-#define PanSource	".\\IoTConfiguration.pml"
+#define SpinVersion	"Spin Version 6.5.2 -- 6 December 2019"
+#define PanSource	"IoTConfiguration.pml"
 
-#define G_long	4
+#define G_long	8
 #define G_int	4
 
 #define ulong	unsigned long
@@ -110,7 +110,7 @@
 #if !defined(HAS_LAST) && defined(BCS)
 	#define HAS_LAST	1 /* use it, but */
 	#ifndef STORE_LAST
-		#define NO_LAST	1 /* don't store it */
+		#define NO_LAST	1 /* dont store it */
 	#endif
 #endif
 #if defined(BCS) && defined(BITSTATE)
@@ -132,20 +132,20 @@ typedef struct S_F_MAP {
 	int upto;
 } S_F_MAP;
 
-#define _nstates2	25	/* :init: */
-#define minseq2	507
-#define maxseq2	530
-#define _endstate2	24
+#define _nstates2	63	/* :init: */
+#define minseq2	1731
+#define maxseq2	1792
+#define _endstate2	62
 
-#define _nstates1	178	/* ProcessGuest */
-#define minseq1	330
-#define maxseq1	506
-#define _endstate1	177
+#define _nstates1	177	/* ProcessGuest */
+#define minseq1	1555
+#define maxseq1	1730
+#define _endstate1	176
 
-#define _nstates0	331	/* ProcessHost */
+#define _nstates0	1556	/* ProcessHost */
 #define minseq0	0
-#define maxseq0	329
-#define _endstate0	330
+#define maxseq0	1554
+#define _endstate0	1555
 
 extern short src_ln2[];
 extern short src_ln1[];
@@ -155,9 +155,9 @@ extern S_F_MAP src_file1[];
 extern S_F_MAP src_file0[];
 
 #define T_ID	unsigned short
-#define _T5	159
-#define _T2	160
-#define WS		4 /* word size in bytes */
+#define _T5	549
+#define _T2	550
+#define WS		8 /* word size in bytes */
 #define SYNC	0
 #define ASYNC	0
 
@@ -181,11 +181,17 @@ struct History { /* user defined type */
 	unsigned shared : 1;
 	short userId;
 };
+struct ThirdPartyServices { /* user defined type */
+	unsigned isLinked : 1;
+	unsigned shared : 1;
+	short userId;
+};
 struct Resource { /* user defined type */
 	short id;
 	short state;
 	struct PersonalData data;
 	struct History history;
+	struct ThirdPartyServices thirdPartyServices;
 };
 struct Channel { /* user defined type */
 	short id;
@@ -200,9 +206,9 @@ struct Policy { /* user defined type */
 	unsigned banned : 1;
 	short id;
 	struct Resource resource;
-	struct Channel chans[20];
-	struct Subject subs[20];
-	struct Right rights[20];
+	struct Channel chans[2];
+	struct Subject subs[2];
+	struct Right rights[5];
 };
 struct PolicyBeRevoked { /* user defined type */
 	short id;
@@ -216,7 +222,7 @@ struct Device { /* user defined type */
 typedef struct P2 { /* :init: */
 	unsigned _pid : 8;  /* 0..255 */
 	unsigned _t   : 3; /* proctype */
-	unsigned _p   : 10; /* state    */
+	unsigned _p   : 12; /* state    */
 #ifdef HAS_PRIORITY
 	unsigned _priority : 8; /* 0..255 */
 #endif
@@ -227,7 +233,7 @@ typedef struct P2 { /* :init: */
 typedef struct P1 { /* ProcessGuest */
 	unsigned _pid : 8;  /* 0..255 */
 	unsigned _t   : 3; /* proctype */
-	unsigned _p   : 10; /* state    */
+	unsigned _p   : 12; /* state    */
 #ifdef HAS_PRIORITY
 	unsigned _priority : 8; /* 0..255 */
 #endif
@@ -246,7 +252,7 @@ typedef struct P1 { /* ProcessGuest */
 typedef struct P0 { /* ProcessHost */
 	unsigned _pid : 8;  /* 0..255 */
 	unsigned _t   : 3; /* proctype */
-	unsigned _p   : 10; /* state    */
+	unsigned _p   : 12; /* state    */
 #ifdef HAS_PRIORITY
 	unsigned _priority : 8; /* 0..255 */
 #endif
@@ -254,7 +260,6 @@ typedef struct P0 { /* ProcessHost */
 	unsigned flag_2 : 1;
 	unsigned flag_3 : 1;
 	unsigned check_policy_result : 1;
-	short _10_1_1_Yunmai_smart_scale_can_revoked[3];
 	int i;
 	int j;
 	int k;
@@ -265,7 +270,7 @@ typedef struct P0 { /* ProcessHost */
 typedef struct P3 { /* np_ */
 	unsigned _pid : 8;  /* 0..255 */
 	unsigned _t   : 3; /* proctype */
-	unsigned _p   : 10; /* state    */
+	unsigned _p   : 12; /* state    */
 #ifdef HAS_PRIORITY
 	unsigned _priority : 8; /* 0..255 */
 #endif
@@ -462,9 +467,8 @@ typedef struct State {
 		unsigned short _event;
 	#endif
 #endif
-	short Users[2];
 	short PolicyNum;
-	struct Device Devices[20];
+	struct Device Devices[5];
 	struct Policy Policies[50];
 #ifdef TRIX
 	/* room for 512 proc+chan ptrs, + safety margin */
@@ -487,6 +491,7 @@ typedef struct TRIX_v6 {
 #endif
 
 #define HAS_TRACK	0
+/* hidden variable: */	short Users[2];
 #define FORWARD_MOVES	"pan.m"
 #define BACKWARD_MOVES	"pan.b"
 #define TRANSITIONS	"pan.t"
@@ -495,9 +500,9 @@ typedef struct TRIX_v6 {
 #define _endstate3	2 /* np_ */
 
 #define _start3	0 /* np_ */
-#define _start2	22
-#define _start1	174
-#define _start0	327
+#define _start2	59
+#define _start1	173
+#define _start0	1
 #ifdef NP
 	#define ACCEPT_LAB	1 /* at least 1 in np_ */
 #else
@@ -857,7 +862,7 @@ void qsend(int, int, int);
 #define GLOBAL	7
 #define BAD	8
 #define ALPHA_F	9
-#define NTRANS	161
+#define NTRANS	551
 #if defined(BFS_PAR) || NCORE>1
 	void e_critical(int);
 	void x_critical(int);
